@@ -1,0 +1,167 @@
+\documentclass[12pt,a4paper]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[brazil]{babel}
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage[margin=2.5cm]{geometry}
+
+\newcommand{\E}{\operatorname{E}}
+\newcommand{\Var}{\operatorname{Var}}
+\newcommand{\plim}{\operatorname{plim}}
+\newcommand{\convp}{\xrightarrow{\;p\;}}
+\newcommand{\convd}{\xrightarrow{\;d\;}}
+
+\title{Problema 13 --- Propriedades do estimador de MQO na regressão múltipla\\(derivações matriciais)}
+\date{}
+
+\begin{document}
+\maketitle
+
+\section*{Modelo e hipóteses}
+O modelo é $Y = X\beta + U$, ou, por observação, $Y_i = X_i'\beta + \mu_i$, $i=1,\dots,n$, com $X_i$ de dimensão $(k+1)\times 1$. O estimador de MQO é
+\[
+  \hat\beta = (X'X)^{-1}X'Y.
+\]
+Hipóteses:
+\begin{enumerate}
+  \item $\E(\mu_i\mid X_i)=0$;
+  \item $(X_i,Y_i)$, $i=1,\dots,n$, são i.i.d.;
+  \item $X_i$ e $\mu_i$ têm quarto momento finito e não nulo;
+  \item $\E(X_iX_i')$ tem posto coluna cheio (sem multicolinearidade perfeita);
+  \item $\Var(\mu_i\mid X_i)=\sigma_\mu^2$ (homoscedasticidade).
+\end{enumerate}
+Implicações usadas abaixo: (1)+(2) $\Rightarrow \E[U\mid X]=0_n$; (1)+(2)+(5) $\Rightarrow \E[UU'\mid X]=\sigma_\mu^2 I_n$.
+
+\paragraph{Resultado-chave.} Substituindo $Y=X\beta+U$,
+\begin{equation}\label{eq:chave}
+  \hat\beta = (X'X)^{-1}X'(X\beta+U) = \beta + (X'X)^{-1}X'U
+  \quad\Longrightarrow\quad
+  \hat\beta-\beta = (X'X)^{-1}X'U.
+\end{equation}
+
+%----------------------------------------------------------------
+\section{Não-viés}
+Hipóteses usadas: 1 a 4. Tomando a esperança condicional em \eqref{eq:chave}, como $X$ é fixado pelo condicionamento,
+\[
+  \E[\hat\beta\mid X] = \beta + (X'X)^{-1}X'\,\E[U\mid X] = \beta + (X'X)^{-1}X'0_n = \beta.
+\]
+Pela lei das expectativas iteradas, $\E[\hat\beta]=\E\big[\E[\hat\beta\mid X]\big]=\beta$. \qed
+
+%----------------------------------------------------------------
+\section{Consistência}
+Hipóteses usadas: 1 a 4. Multiplicando e dividindo por $n$ em \eqref{eq:chave},
+\[
+  \hat\beta-\beta = \left(\frac{X'X}{n}\right)^{-1}\frac{X'U}{n}
+  = \left(\frac1n\sum_{i=1}^n X_iX_i'\right)^{-1}\left(\frac1n\sum_{i=1}^n X_i\mu_i\right).
+\]
+
+\paragraph{Primeiro fator.} O elemento $(j,l)$ de $X'X/n$ é $\frac1n\sum_i X_{ji}X_{li}$. Pela hipótese 2 os produtos $X_{ji}X_{li}$ são i.i.d.; pela hipótese 3 e pela desigualdade de Cauchy--Schwarz,
+\[
+  \E[(X_{ji}X_{li})^2]\le\sqrt{\E[X_{ji}^4]\,\E[X_{li}^4]}<\infty .
+\]
+Pela Lei dos Grandes Números, $\frac1n\sum_i X_{ji}X_{li}\convp \E[X_{ji}X_{li}]$ para todo $(j,l)$, isto é,
+\[
+  \frac{X'X}{n}\convp \E(X_iX_i').
+\]
+Pela hipótese 4, $\E(X_iX_i')$ é invertível e, como a inversão é contínua,
+$\left(X'X/n\right)^{-1}\convp[\E(X_iX_i')]^{-1}$.
+
+\paragraph{Segundo fator.} Os vetores $X_i\mu_i$ são i.i.d. (hipótese 2). Pela lei das expectativas iteradas e pela hipótese 1,
+\[
+  \E[X_i\mu_i]=\E\big[X_i\,\E[\mu_i\mid X_i]\big]=0_{k+1}.
+\]
+Além disso, $X_i\mu_i$ tem segundo momento finito: para um vetor não aleatório $c$, $\E[(c'X_i\mu_i)^2]\le\sqrt{\E[(c'X_i)^4]\,\E[\mu_i^4]}<\infty$ (hipótese 3). Pela LGN,
+\[
+  \frac{X'U}{n}=\frac1n\sum_{i=1}^n X_i\mu_i\convp \E[X_i\mu_i]=0_{k+1}.
+\]
+
+\paragraph{Conclusão.} Pelo teorema de Slutsky (continuidade do produto),
+\[
+  \hat\beta-\beta \convp [\E(X_iX_i')]^{-1}\,0_{k+1}=0_{k+1}
+  \quad\Longrightarrow\quad \hat\beta\convp\beta. \qed
+\]
+
+%----------------------------------------------------------------
+\section{Eficiência (Teorema de Gauss--Markov)}
+Condições: (i) $\E[U\mid X]=0_n$; (ii) $\E[UU'\mid X]=\sigma_\mu^2 I_n$; (iii) $X$ com posto coluna cheio. Mostramos que $\hat\beta$ é BLUE: entre os estimadores lineares e não viesados, tem a menor variância.
+
+\paragraph{Variância do MQO.} De \eqref{eq:chave},
+\[
+  \Var(\hat\beta\mid X)=(X'X)^{-1}X'\,\E[UU'\mid X]\,X(X'X)^{-1}
+  =\sigma_\mu^2(X'X)^{-1}X'X(X'X)^{-1}=\sigma_\mu^2(X'X)^{-1}.
+\]
+
+\paragraph{Outro estimador linear.} Seja $\tilde\beta=CY$ qualquer estimador linear, com $C$ dependendo apenas de $X$. Defina $D=C-(X'X)^{-1}X'$, de modo que $C=(X'X)^{-1}X'+D$. Então
+\[
+  \tilde\beta = CX\beta+CU=\beta+DX\beta+\left[(X'X)^{-1}X'+D\right]U .
+\]
+
+\paragraph{Não-viés impõe $DX=0$.} Tomando $\E[\cdot\mid X]$, $\E[\tilde\beta\mid X]=\beta+DX\beta$. Para que $\tilde\beta$ seja não viesado para todo $\beta$, é necessário que $DX=0$. Nesse caso, $X'D'=(DX)'=0$ e
+\[
+  \tilde\beta-\beta=\left[(X'X)^{-1}X'+D\right]U .
+\]
+
+\paragraph{Variância de $\tilde\beta$.}
+\begin{align*}
+  \Var(\tilde\beta\mid X)
+  &=\left[(X'X)^{-1}X'+D\right]\sigma_\mu^2 I_n\left[X(X'X)^{-1}+D'\right]\\
+  &=\sigma_\mu^2\Big[(X'X)^{-1}+\underbrace{(X'X)^{-1}X'D'}_{=0}+\underbrace{DX(X'X)^{-1}}_{=0}+DD'\Big]\\
+  &=\sigma_\mu^2(X'X)^{-1}+\sigma_\mu^2DD'.
+\end{align*}
+
+\paragraph{Comparação.}
+\[
+  \Var(\tilde\beta\mid X)-\Var(\hat\beta\mid X)=\sigma_\mu^2\,DD'.
+\]
+Para todo vetor $c$, $c'DD'c=\lVert D'c\rVert^2\ge0$; logo $DD'$ é semidefinida positiva e, para toda combinação linear $c'\beta$,
+\[
+  \Var(c'\tilde\beta\mid X)\ge\Var(c'\hat\beta\mid X),
+\]
+com igualdade para todo $c$ se e somente se $D=0$, isto é, $\tilde\beta=\hat\beta$. Portanto $\hat\beta$ é BLUE. \qed
+
+%----------------------------------------------------------------
+\section{Distribuição assintótica}
+Hipóteses usadas: 1 a 5. Queremos mostrar que
+\[
+  \sqrt n(\hat\beta-\beta)\convd N\!\left(0_{k+1},\ \sigma_\mu^2[\E(X_iX_i')]^{-1}\right).
+\]
+De \eqref{eq:chave}, multiplicando por $\sqrt n$ e rearranjando,
+\[
+  \sqrt n(\hat\beta-\beta)=\underbrace{\left(\frac{X'X}{n}\right)^{-1}}_{(A)}\ \underbrace{\frac{X'U}{\sqrt n}}_{(B)} .
+\]
+
+\paragraph{Fator (A).} Como na seção de consistência, pela LGN e pela hipótese 4,
+\[
+  \left(\frac{X'X}{n}\right)^{-1}\convp[\E(X_iX_i')]^{-1}.
+\]
+
+\paragraph{Fator (B).} Escrevemos $\dfrac{X'U}{\sqrt n}=\sqrt n\,\dfrac1n\sum_{i=1}^nX_i\mu_i$. Os termos $X_i\mu_i$ são i.i.d., têm média $0_{k+1}$ (seção anterior) e matriz de covariância
+\[
+  \E[X_i\mu_i(X_i\mu_i)']=\E[X_iX_i'\mu_i^2],
+\]
+finita pela hipótese 3 (Cauchy--Schwarz aplicada a $c'X_i\mu_i$, como antes). Sob homoscedasticidade (hipótese 5), pela lei das expectativas iteradas,
+\[
+  \E[X_iX_i'\mu_i^2]=\E\big[X_iX_i'\,\E[\mu_i^2\mid X_i]\big]=\sigma_\mu^2\,\E[X_iX_i'].
+\]
+Esta matriz é positiva definida (hipótese 4), então o limite é uma normal não degenerada. Pelo Teorema Central do Limite multivariado,
+\[
+  \frac{X'U}{\sqrt n}\convd N\!\left(0_{k+1},\ \sigma_\mu^2\,\E[X_iX_i']\right).
+\]
+
+\paragraph{Juntando (A) e (B).} Pelo teorema de Slutsky,
+\[
+  \sqrt n(\hat\beta-\beta)\convd[\E(X_iX_i')]^{-1}\cdot N\!\left(0_{k+1},\sigma_\mu^2\E[X_iX_i']\right).
+\]
+Se $Z\sim N(0,\Sigma)$ e $A$ é uma matriz fixa, então $AZ\sim N(0,A\Sigma A')$. Com $A=[\E(X_iX_i')]^{-1}$ (simétrica),
+\[
+  \sqrt n(\hat\beta-\beta)\convd N\!\Big(0_{k+1},\ \sigma_\mu^2[\E(X_iX_i')]^{-1}\E(X_iX_i')[\E(X_iX_i')]^{-1}\Big)
+  = N\!\Big(0_{k+1},\ \sigma_\mu^2[\E(X_iX_i')]^{-1}\Big). \qed
+\]
+Em amostras grandes, $\hat\beta\overset{a}{\sim}N\!\big(\beta,\ \tfrac{\sigma_\mu^2}{n}[\E(X_iX_i')]^{-1}\big)$.
+
+\paragraph{Sem homoscedasticidade.} Os passos são os mesmos, mas a variância de (B) é $\E[X_iX_i'\mu_i^2]$, e
+\[
+  \sqrt n(\hat\beta-\beta)\convd N\!\Big(0_{k+1},\ [\E(X_iX_i')]^{-1}\,\E(X_iX_i'\mu_i^2)\,[\E(X_iX_i')]^{-1}\Big).
+\]
+
+\end{document}
